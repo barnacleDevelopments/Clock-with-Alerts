@@ -1,50 +1,64 @@
 const timeBox = document.querySelector("#time");
-      
-const firstSelector = document.querySelector("#gaming")
-const secondSelector = document.querySelector("#lunch")
-const thirdSelector = document.querySelector("#cat")
-
-const imgBox = document.querySelector("#img-box")
-
-console.log(imgBox)
-
-function getDropDownValues() {
-    let firstSelectedOption = firstSelector.options[firstSelector.selectedIndex].value,
-        secondSelectedOption = secondSelector.options[secondSelector.selectedIndex].value,
-        thirdSelectedOption = thirdSelector.options[thirdSelector.selectedIndex].value
-
-}
-
-function changeImage() {
-
-}
-
-window.addEventListener("load", () => {
-    setInterval(setTime, 1000)
-})
+const optionListOne = document.querySelector("#gaming")
+const optionListTwo = document.querySelector("#lunch")
+const optionListThree = document.querySelector("#cat")
+const img = document.querySelector("#img")
 
 function getDate() {
-    return new Date();
-}
-
-function convertToTwelveHour(time) {
-    if(time > 12) {
-        return time - 12
-    }
+    let d = new Date();
+    return d
 }
 
 function setTime() {
     const Time = {
-        sec: getDate().getSeconds(),
-        min: getDate().getMinutes(),
-        hour: convertToTwelveHour(getDate().getHours()),
+        sec: Number(getDate().getSeconds()),
+        min: Number(getDate().getMinutes()),
+        hour: Number(getDate().getHours()),
+        convertHours: function(digit) {
+            return digit >= 12 ? this.hour - 12 : this.hour
+        },
+        buildDigit: function(timeType) {
+            let digit = timeType
+            if(digit >= 10) {
+                return `${digit}`
+            } else {
+                return `0${digit}`
+            }
+        },
+        buildClock: function(){
+            let clock = ``,
+                colon = ` : `
+            return clock.concat(Time.buildDigit(this.convertHours(this.hour)), colon, Time.buildDigit(this.min), colon, Time.buildDigit(this.sec), this.ampm())
+        },
         ampm: function() {
-            return this.hour <= 12 ? "pm" : "am"
+            return this.hour <= 12 ? ` pm` : ` am`
         }
     }
-    let am = document.createTextNode("am")
-    let pm = document.createTextNode("pm")
-    let currentTime = document.createTextNode(`${Time.hour} : ${Time.min} : ${Time.sec} ${Time.ampm()}`)
-        timeBox.replaceChild(currentTime, timeBox.firstChild)
+
+    let currentTime = document.createTextNode(Time.buildClock())
+        timeBox.replaceChild(currentTime, timeBox.firstChild) 
+
+    let listValues = checkValueOfListItems()
+
+    if(listValues.listOne === Time.hour) {
+        img.src = "./img/gaming.jpg"
+    } else if(listValues.listTwo === Time.hour) {
+        img.src = "./img/lunch.jpg"
+    } else if(listValues.listThree === Time.hour) {
+        img.src = "./img/cat.jpg"
+    } else {
+        img.src = "./cat.jpg"
+    }
 }
 
+function checkValueOfListItems() {
+    return {
+        listOne: Number(optionListOne.value),
+        listTwo: Number(optionListTwo.value),
+        listThree: Number(optionListThree.value)
+    }
+}
+
+window.addEventListener("load", () => {
+    setInterval(setTime, 1000)
+});
